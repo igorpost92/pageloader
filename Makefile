@@ -2,9 +2,9 @@ install:
 	npm install
 
 compile:
-	npm run compile
+	npm run build -- --watch
 
-publish:
+publish: test lint;
 	npm publish
 
 build:
@@ -12,6 +12,9 @@ build:
 
 test:
 	npm test
+
+test-cover:
+	npm test -- --coverage
 
 watch-test:
 	npm test -- --watchAll

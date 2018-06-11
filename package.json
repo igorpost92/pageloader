@@ -7,7 +7,6 @@
     "test": "jest",
     "babel-node": "babel-node",
     "eslint": "eslint",
-    "compile": "babel src --out-dir dist --source-maps inline --watch",
     "prebuild": "rm -rf dist",
     "build": "babel src --out-dir dist --source-maps inline",
     "prepublishOnly": "npm run build"
@@ -17,7 +16,7 @@
     "url": "git+https://github.com/igorpost92/project-lvl3-s262.git"
   },
   "bin": {
-    "gendiff": "dist/bin/pageloader.js"
+    "pageloader": "dist/bin/pageloader.js"
   },
   "files": [
     "dist"
