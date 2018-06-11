@@ -1,0 +1,52 @@
+{
+  "name": "post-hexlet-pageloader",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "babel-node": "babel-node",
+    "eslint": "eslint",
+    "compile": "babel src --out-dir dist --source-maps inline --watch",
+    "prebuild": "rm -rf dist",
+    "build": "babel src --out-dir dist --source-maps inline",
+    "prepublishOnly": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/igorpost92/project-lvl3-s262.git"
+  },
+  "bin": {
+    "gendiff": "dist/bin/pageloader.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "jest": {
+    "testEnvironment": "node"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/igorpost92/project-lvl3-s262/issues"
+  },
+  "homepage": "https://github.com/igorpost92/project-lvl3-s262#readme",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.3",
+    "babel-eslint": "^8.2.3",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-stage-0": "^6.24.1",
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.12.0",
+    "jest": "^23.1.0",
+    "nock": "^9.3.2"
+  },
+  "dependencies": {
+    "axios": "^0.18.0",
+    "commander": "^2.15.1",
+    "mz": "^2.7.0"
+  }
+}

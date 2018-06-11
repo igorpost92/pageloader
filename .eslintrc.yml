@@ -1,0 +1,14 @@
+parserOptions:
+  ecmaVersion: 6
+
+extends:
+  - 'airbnb-base'
+
+env:
+  node: true
+  jest: true
+
+parser: babel-eslint
+
+rules:
+  no-console: off
