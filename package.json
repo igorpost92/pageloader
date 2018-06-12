@@ -1,6 +1,6 @@
 {
   "name": "post-hexlet-pageloader",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -45,6 +45,7 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
+    "cheerio": "^1.0.0-rc.2",
     "commander": "^2.15.1",
     "mz": "^2.7.0"
   }
