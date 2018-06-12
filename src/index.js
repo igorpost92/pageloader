@@ -2,8 +2,13 @@ import { get } from 'axios';
 import path from 'path';
 import fs from 'mz/fs';
 import cheerio from 'cheerio';
+import dbg from 'debug';
 
 import { makeName } from './utils';
+
+const debug = dbg('pageloader');
+const debEr = dbg('pageloader-ERROR');
+const debOk = dbg('pageloader-ok');
 
 const removeDuplicates = (items) => {
   const processed = new Set();
@@ -19,8 +24,12 @@ const removeDuplicates = (items) => {
 };
 
 const storeFile = ({ link, saveAs }) => get(link, { responseType: 'arraybuffer' })
-  .then(({ data }) => fs.writeFile(saveAs, data))
+  .then(({ data }) => {
+    debOk(link);
+    return fs.writeFile(saveAs, data);
+  })
   .catch(() => {
+    debEr(link);
     // TODO: error during downloading file
     // https://cdn2.hexlet.io/assets/essential-a6af23ea2acf1f29eccada458f710ccfc9cb1d9d13dad1ab154a54fe65c167ee.js
   });
@@ -66,14 +75,21 @@ const storeSourceFiles = (saveName, html, outDir) => {
 const processDocument = (urlLink, html, outDir) => {
   const name = makeName(urlLink);
 
+  const onResolved = (result) => {
+    const pathfile = path.join(outDir, `${name}.html`);
+    return fs.writeFile(pathfile, result)
+      .then(() => {
+        debOk(urlLink);
+      });
+  };
+
   return storeSourceFiles(name, html, outDir)
-    .then((result) => {
-      const pathfile = path.join(outDir, `${name}.html`);
-      return fs.writeFile(pathfile, result);
-    });
+    .then(onResolved);
 };
 
 const download = (siteUrl, outDir = process.cwd()) => {
+  debug('start');
+
   if (!siteUrl) {
     throw new Error('Website url is not provided');
   }
@@ -84,6 +100,7 @@ const download = (siteUrl, outDir = process.cwd()) => {
         throw new Error('Provided path is not a directory');
       }
 
+      debug(`outDir: ${outDir}`);
       return get(siteUrl, { responseType: 'arraybuffer' });
     })
     .then((response) => {
@@ -91,7 +108,11 @@ const download = (siteUrl, outDir = process.cwd()) => {
         throw new Error(`Returned code ${response.status}: ${response.statusTest}`);
       }
 
-      return processDocument(siteUrl, response.data, outDir);
+      debug(`connected: ${siteUrl}`);
+      return processDocument(siteUrl, response.data, outDir)
+        .then(() => {
+          debug('finish');
+        });
     });
 };
 
