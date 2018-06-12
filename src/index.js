@@ -18,16 +18,15 @@ const removeDuplicates = (items) => {
   return uniqs;
 };
 
-const storeSrcFile = ({ link, saveAs }) => get(link, { responseType: 'arraybuffer' })
+const storeFile = ({ link, saveAs }) => get(link, { responseType: 'arraybuffer' })
   .then(({ data }) => fs.writeFile(saveAs, data))
   .catch(() => {
     // TODO: error during downloading file
     // https://cdn2.hexlet.io/assets/essential-a6af23ea2acf1f29eccada458f710ccfc9cb1d9d13dad1ab154a54fe65c167ee.js
   });
 
-const processDocument = (urlLink, html, outDir) => {
-  const name = makeName(urlLink);
-  const relPath = `${name}_files`;
+const storeSourceFiles = (saveName, html, outDir) => {
+  const relPath = `${saveName}_files`;
   const srcDir = path.join(outDir, relPath);
 
   const $ = cheerio.load(html);
@@ -58,14 +57,20 @@ const processDocument = (urlLink, html, outDir) => {
 
   const files = removeDuplicates([...scripts, ...links, ...images]);
 
-  const result = $.html();
-
-  const pathfile = path.join(outDir, `${name}.html`);
-
   return fs.access(srcDir)
     .catch(() => fs.mkdir(srcDir))
-    .then(() => Promise.all(files.map(storeSrcFile)))
-    .then(() => fs.writeFile(pathfile, result));
+    .then(() => Promise.all(files.map(storeFile)))
+    .then(() => $.html());
+};
+
+const processDocument = (urlLink, html, outDir) => {
+  const name = makeName(urlLink);
+
+  return storeSourceFiles(name, html, outDir)
+    .then((result) => {
+      const pathfile = path.join(outDir, `${name}.html`);
+      return fs.writeFile(pathfile, result);
+    });
 };
 
 const download = (siteUrl, outDir = process.cwd()) => {
@@ -79,9 +84,7 @@ const download = (siteUrl, outDir = process.cwd()) => {
         throw new Error('Provided path is not a directory');
       }
 
-      return get(siteUrl, {
-        responseType: 'arraybuffer',
-      });
+      return get(siteUrl, { responseType: 'arraybuffer' });
     })
     .then((response) => {
       if (response.status !== 200) {

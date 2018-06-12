@@ -10,3 +10,9 @@
 ```sh
 $ npm install -g post-hexlet-pageloader
 ```
+
+## Usage
+
+```sh
+$ pageloader [-o|--output dir] <https://....>
+```
