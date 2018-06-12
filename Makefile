@@ -13,6 +13,9 @@ build:
 test:
 	npm test
 
+debug:
+	DEBUG="pageloader*" npm test
+
 test-cover:
 	npm test -- --coverage
 
