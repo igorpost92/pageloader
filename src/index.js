@@ -69,11 +69,15 @@ const saveFiles = (saveName, html, outDir) => {
     debug(`downloading: ${link}`);
     return get(link, { responseType: 'arraybuffer' })
       .then(({ data }) => {
-        debug(`saving as: ${link}`);
+        debug(`saving as: ${saveAs}`);
         return fs.writeFile(saveAs, data);
+      }, (err) => {
+        debEr('downloading error', '\n', err.message);
+        console.error(`Error while loading file:\n${link}`);
       })
       .catch((err) => {
-        debEr(link, '\n', err.message);
+        debEr('saving error', '\n', err.message);
+        console.error(`Error while saving file:\n${saveAs}`);
       });
   };
 
@@ -96,7 +100,10 @@ const savePage = (urlLink, html, outDir) => {
   const onResolved = (result) => {
     const pathfile = path.join(outDir, `${name}.html`);
     debug(`saving page as: ${pathfile}`);
-    return fs.writeFile(pathfile, result);
+    return fs.writeFile(pathfile, result)
+      .catch(() => {
+        console.error('Error while saving page');
+      });
   };
 
   return saveFiles(name, html, outDir)
