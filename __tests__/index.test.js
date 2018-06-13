@@ -1,13 +1,13 @@
 import path from 'path';
 import nock from 'nock';
-import fs from 'mz/fs';
+import { promises as fs } from 'fs';
 
 import { makeName, mkdtemp } from '../src/utils';
 import download from '../src/';
 
 describe('Make name', () => {
-  it('set1', () => {
-    const address = 'https://hexlet.io/courses';
+  it('set 1', () => {
+    const address = 'https://-hexlet-.io/courses/';
     const expected = 'hexlet-io-courses';
     expect(makeName(address)).toBe(expected);
   });
@@ -23,12 +23,7 @@ describe('Download', () => {
   it('non-existent directory', async () => {
     const address = 'https://hexlet.io/courses';
     const outDir = '/non/existent';
-
-    try {
-      await download(address, outDir);
-    } catch (error) {
-      expect(error.code).toBe('ENOENT');
-    }
+    await expect(download(address, outDir)).rejects.toThrow();
   });
 
   it('set1', async () => {

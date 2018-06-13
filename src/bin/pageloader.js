@@ -8,6 +8,11 @@ process.on('uncaughtException', (err) => {
   process.exitCode = 1;
 });
 
+process.on('unhandledRejection', (err) => {
+  console.error(err.message);
+  process.exitCode = 2;
+});
+
 programm
   .version(version)
   .arguments('<url>')
