@@ -42,13 +42,13 @@ const saveFiles = (saveName, html, outDir) => {
     {
       tagName: 'img',
       attrName: 'src',
+      extraFilter: () => true,
     },
   ];
 
   const processNodes = ({ tagName, attrName, extraFilter }) => {
-    const selection = $(tagName);
-    const nodes = extraFilter === undefined ? selection : selection.filter(extraFilter);
-    return nodes
+    const selection = $(tagName).filter(extraFilter);
+    return selection
       .map((ind, el) => {
         const link = $(el).attr(attrName);
         const ext = path.extname(link);
