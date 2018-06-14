@@ -8,18 +8,17 @@ process.on('uncaughtException', (err) => {
   process.exitCode = 1;
 });
 
-process.on('unhandledRejection', (err) => {
-  console.error(err.message);
-  process.exitCode = 2;
-});
-
 programm
   .version(version)
   .arguments('<url>')
   .description('Downloads a website to your local computer.')
   .option('-o, --output [dir]', 'output directory')
   .action((url) => {
-    download(url, programm.output);
+    download(url, programm.output)
+      .catch((err) => {
+        console.error(err.message);
+        process.exitCode = 2;
+      });
   })
   .parse(process.argv);
 
