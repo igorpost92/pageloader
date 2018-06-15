@@ -1,11 +1,11 @@
 {
   "name": "post-hexlet-pageloader",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "babel-node": "babel-node",
+    "bn": "babel-node",
     "eslint": "eslint",
     "prebuild": "rm -rf dist",
     "build": "babel src --out-dir dist --source-maps inline",
@@ -47,6 +47,7 @@
     "axios": "^0.18.0",
     "cheerio": "^1.0.0-rc.2",
     "commander": "^2.15.1",
-    "debug": "^3.1.0"
+    "debug": "^3.1.0",
+    "listr": "^0.14.1"
   }
 }

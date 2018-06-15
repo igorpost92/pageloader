@@ -3,4 +3,4 @@ dist/
 .vscode/
 coverage/
 *.DS_Store
-src/t.js
+src/temp

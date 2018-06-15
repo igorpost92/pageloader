@@ -22,10 +22,25 @@ const removeDuplicates = (items) => {
   return uniqs;
 };
 
-const saveFiles = (saveName, html, outDir) => {
-  const relPath = `${saveName}_files`;
-  const srcDir = path.join(outDir, relPath);
+const downloadAsset = ({ link, relPath }, outDir) => {
+  const saveAs = path.join(outDir, relPath);
 
+  debug(`downloading: ${link}`);
+  return get(link, { responseType: 'arraybuffer' })
+    .then(({ data }) => {
+      debug(`saving as: ${saveAs}`);
+      return fs.writeFile(saveAs, data);
+    }, (err) => {
+      debEr('downloading error', '\n', err.message);
+      // console.error(`Error while loading file: ${link}`);
+    })
+    .catch((err) => {
+      debEr('saving error', '\n', err.message);
+      // console.error(`Error while saving file:\n${saveAs}`);
+    });
+};
+
+const extractAssets = (html, folder) => {
   const $ = cheerio.load(html);
 
   const tags = [
@@ -47,67 +62,48 @@ const saveFiles = (saveName, html, outDir) => {
   ];
 
   const processNodes = ({ tagName, attrName, extraFilter }) => {
-    const selection = $(tagName).filter(extraFilter);
-    return selection
-      .map((ind, el) => {
-        const link = $(el).attr(attrName);
-        const ext = path.extname(link);
-        const withoutExt = ext.length ? link.slice(0, -ext.length) : link;
+    const selection = $(tagName).filter(extraFilter).toArray();
+    const assets = selection.map((el) => {
+      // TODO:
+      const link = $(el).attr(attrName);
+      const ext = path.extname(link);
+      const withoutExt = ext.length ? link.slice(0, -ext.length) : link;
 
-        const filename = `${makeName(withoutExt)}${ext}`;
+      const filename = `${makeName(withoutExt)}${ext}`;
+      const relPath = path.join(folder, filename);
+      $(el).attr(attrName, relPath);
+      return { link, relPath };
+    });
 
-        const relUrl = path.join(relPath, filename);
-        const saveAs = path.join(srcDir, filename);
-
-        $(el).attr(attrName, relUrl);
-        return { link, saveAs };
-      })
-      .toArray();
+    return removeDuplicates(assets);
   };
 
-  const storeFile = ({ link, saveAs }) => {
-    debug(`downloading: ${link}`);
-    return get(link, { responseType: 'arraybuffer' })
-      .then(({ data }) => {
-        debug(`saving as: ${saveAs}`);
-        return fs.writeFile(saveAs, data);
-      }, (err) => {
-        debEr('downloading error', '\n', err.message);
-        console.error(`Error while loading file:\n${link}`);
-      })
-      .catch((err) => {
-        debEr('saving error', '\n', err.message);
-        console.error(`Error while saving file:\n${saveAs}`);
-      });
-  };
-
-  const files = tags
-    .map((tag) => {
-      const res = processNodes(tag);
-      return removeDuplicates(res);
-    })
+  const files = tags.map(processNodes)
     .reduce((acc, el) => acc.concat(el));
 
-  return fs.access(srcDir)
-    .catch(() => fs.mkdir(srcDir))
-    .then(() => Promise.all(files.map(storeFile)))
-    .then(() => $.html());
+  return { content: $.html(), assets: files };
 };
+
+const makeDirForAssets = name => fs.access(name)
+  .catch(() => fs.mkdir(name));
 
 const savePage = (urlLink, html, outDir) => {
   const name = makeName(urlLink);
+  const assetsDir = `${name}_files`;
+  const assetsDirPath = path.join(outDir, assetsDir);
 
-  const onResolved = (result) => {
-    const pathfile = path.join(outDir, `${name}.html`);
-    debug(`saving page as: ${pathfile}`);
-    return fs.writeFile(pathfile, result)
-      .catch(() => {
-        console.error('Error while saving page');
-      });
-  };
+  const { content, assets } = extractAssets(html, assetsDir);
 
-  return saveFiles(name, html, outDir)
-    .then(onResolved);
+  return makeDirForAssets(assetsDirPath)
+    .then(() => Promise.all(assets.map(asset => downloadAsset(asset, outDir))))
+    .then(() => {
+      const pathfile = path.join(outDir, `${name}.html`);
+      debug(`saving page as: ${pathfile}`);
+      return fs.writeFile(pathfile, content);
+    })
+    .catch(() => {
+      throw new Error('Error while saving page');
+    });
 };
 
 const download = (siteUrl, outDir = process.cwd()) => {
