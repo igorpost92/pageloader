@@ -30,12 +30,12 @@ const downloadAsset = ({ link, relPath }, outDir) => {
   debug(`downloading: ${link}`);
   return get(link, { responseType: 'arraybuffer' })
     .then(({ data }) => {
-      debug(`saving as: ${saveAs}`);
+      debug(`saving as: ${relPath}`);
       return fs.writeFile(saveAs, data);
     })
     .catch((err) => {
       debEr('error', '\n', err.message);
-      throw new Error(`Error while saving file: ${saveAs}`);
+      throw new Error(`Error while saving file: ${relPath}`);
     });
 };
 
