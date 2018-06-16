@@ -39,8 +39,7 @@ const downloadFile = ({ link, relPath }, outDir) => {
 };
 
 export const downloadAssets = (ctx, observer, assets, outDir, assetsFolder) => {
-  const makeDirForAssets = name => fs.access(name)
-    .catch(() => fs.mkdir(name));
+  const makeDirForAssets = name => fs.access(name).catch(() => fs.mkdir(name));
 
   return makeDirForAssets(assetsFolder)
     .then(() => {
@@ -63,9 +62,7 @@ export const downloadAssets = (ctx, observer, assets, outDir, assetsFolder) => {
             });
         };
 
-        return Promise.resolve().then(() => {
-          iter(assets);
-        });
+        return Promise.resolve().then(() => iter(assets));
       });
 
       return downloading.then(() => {
