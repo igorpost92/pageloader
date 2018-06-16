@@ -11,18 +11,19 @@ process.on('uncaughtException', (err) => {
 });
 
 const action = (url, dir) => {
-  const tasks = new Listr([
-    {
-      title: 'Saving page',
-      task: () => download(url, dir),
-    },
-  ]);
+  // const tasks = new Listr([
+  //   {
+  //     title: 'Saving page',
+  //     task: () => download(url, dir),
+  //   },
+  // ]);
 
-  tasks.run()
-    .catch((err) => {
-      console.error(err.message);
-      process.exitCode = 2;
-    });
+  // tasks.run()
+  //   .catch((err) => {
+  //     console.error(err.message);
+  //     process.exitCode = 2;
+  //   });
+  download(url, dir);
 };
 
 programm

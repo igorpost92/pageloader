@@ -3,6 +3,8 @@ import path from 'path';
 import { promises as fs } from 'fs';
 import cheerio from 'cheerio';
 import dbg from 'debug';
+import url from 'url';
+import Listr from 'listr';
 
 import { makeName } from './utils';
 
@@ -30,13 +32,10 @@ const downloadAsset = ({ link, relPath }, outDir) => {
     .then(({ data }) => {
       debug(`saving as: ${saveAs}`);
       return fs.writeFile(saveAs, data);
-    }, (err) => {
-      debEr('downloading error', '\n', err.message);
-      console.error(`Error while loading file: ${link}`);
     })
     .catch((err) => {
-      debEr('saving error', '\n', err.message);
-      console.error(`Error while saving file:\n${saveAs}`);
+      debEr('error', '\n', err.message);
+      throw new Error(`Error while saving file: ${saveAs}`);
     });
 };
 
@@ -95,14 +94,33 @@ const savePage = (urlLink, html, outDir) => {
   const { content, assets } = extractAssets(html, assetsDir);
 
   return makeDirForAssets(assetsDirPath)
-    .then(() => Promise.all(assets.map(asset => downloadAsset(asset, outDir))))
     .then(() => {
-      const pathfile = path.join(outDir, `${name}.html`);
-      debug(`saving page as: ${pathfile}`);
-      return fs.writeFile(pathfile, content);
-    })
-    .catch(() => {
-      throw new Error('Error while saving page');
+      const tasks = new Listr([
+        {
+          title: 'Saving page',
+          task: () => {
+            const pathfile = path.join(outDir, `${name}.html`);
+            debug(`saving page as: ${pathfile}`);
+            return fs.writeFile(pathfile, content);
+          },
+        },
+        {
+          title: 'Saving assets',
+          task: () => new Listr(assets.map((asset) => {
+            const title = url.parse(asset.link).path;
+            const task = (cts, curTask) => downloadAsset(asset, outDir)
+              .catch((e) => {
+                curTask.skip(e.message);
+              });
+            return { title, task };
+          }), { exitOnError: false, collapse: true, concurrent: true }),
+        },
+      ]);
+
+      return tasks.run()
+        .catch(({ errors }) => {
+          errors.forEach(e => console.error(e.message));
+        });
     });
 };
 
