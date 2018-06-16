@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 import programm from 'commander';
-import Listr from 'listr';
 
 import { version } from '../../package.json';
 import download from '../';
