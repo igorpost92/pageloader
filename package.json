@@ -1,6 +1,6 @@
 {
   "name": "post-hexlet-pageloader",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -51,6 +51,7 @@
     "cheerio": "^1.0.0-rc.2",
     "commander": "^2.15.1",
     "debug": "^3.1.0",
-    "listr": "^0.14.1"
+    "listr": "^0.14.1",
+    "rxjs": "^6.2.1"
   }
 }

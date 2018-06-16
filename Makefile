@@ -27,3 +27,6 @@ lint:
 
 start:
 	npm run babel-node ./src/bin/pageloader.js
+
+push: lint test;
+	git push
