@@ -4,7 +4,10 @@ install:
 compile:
 	npm run build -- --watch
 
-publish: test lint;
+push: lint test;
+	git push
+	
+publish: push;
 	npm publish
 
 build:
@@ -27,6 +30,3 @@ lint:
 
 start:
 	npm run babel-node ./src/bin/pageloader.js
-
-push: lint test;
-	git push
