@@ -30,14 +30,13 @@ describe('Download', () => {
     const fixtures = path.join(__dirname, '__fixtures__');
 
     const data = await fs.readFile(path.join(fixtures, 'before.html'), 'utf-8');
-    nock('https://hexlet.io')
-      .get('/courses')
-      .reply(200, data);
+    nock('https://hexlet.io').get('/courses').reply(200, data);
 
     const image = await fs.readFile(path.join(fixtures, 'icon.png'));
-    nock('http://test.ru')
-      .get('/icon.png')
-      .reply(200, image);
+    nock('https://test.ru').get('/icon.png').reply(200, image);
+
+    const script = await fs.readFile(path.join(fixtures, 'script.js'));
+    nock('https://test.ru').get('/script.js').reply(200, script);
 
     const address = 'https://hexlet.io/courses';
     const outDir = await mkdtemp();
@@ -52,9 +51,12 @@ describe('Download', () => {
 
     const expected2 = [
       'test-ru-icon.png',
+      'test-ru-script.js',
     ];
     const files2 = await fs.readdir(path.join(outDir, expected1[1]));
     expect(files2).toEqual(expected2);
+
+    console.log(files2);
 
     const resultHtml = await fs.readFile(path.join(outDir, 'hexlet-io-courses.html'), 'utf-8');
     const expectedHtml = await fs.readFile(path.join(fixtures, 'after.html'), 'utf-8');

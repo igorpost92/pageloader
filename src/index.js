@@ -32,11 +32,11 @@ const downloadAsset = ({ link, relPath }, outDir) => {
       return fs.writeFile(saveAs, data);
     }, (err) => {
       debEr('downloading error', '\n', err.message);
-      // console.error(`Error while loading file: ${link}`);
+      console.error(`Error while loading file: ${link}`);
     })
     .catch((err) => {
       debEr('saving error', '\n', err.message);
-      // console.error(`Error while saving file:\n${saveAs}`);
+      console.error(`Error while saving file:\n${saveAs}`);
     });
 };
 

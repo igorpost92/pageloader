@@ -22,7 +22,10 @@
     "dist"
   ],
   "jest": {
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "testPathIgnorePatterns": [
+      "__fixtures__/"
+    ]
   },
   "keywords": [],
   "author": "",
