@@ -2,7 +2,7 @@ import path from 'path';
 import nock from 'nock';
 import { promises as fs } from 'fs';
 
-import { makeName, mkdtemp } from '../src/utils';
+import { makeName, makeNameWithExt, mkdtemp } from '../src/utils';
 import download from '../src/';
 
 describe('Make name', () => {
@@ -10,6 +10,12 @@ describe('Make name', () => {
     const address = 'https://-hexlet-.io/courses/';
     const expected = 'hexlet-io-courses';
     expect(makeName(address)).toBe(expected);
+  });
+
+  it('set 2 with extension', () => {
+    const address = 'https://-hexlet-.io/courses/makeSomething.js';
+    const expected = 'hexlet-io-courses-makeSomething.js';
+    expect(makeNameWithExt(address)).toBe(expected);
   });
 });
 
@@ -38,6 +44,9 @@ describe('Download', () => {
     const script = await fs.readFile(path.join(fixtures, 'script.js'));
     nock('https://test.ru').get('/script.js').reply(200, script);
 
+    const style = await fs.readFile(path.join(fixtures, 'style.css'));
+    nock('https://test.ru').get('/style.css').reply(200, style);
+
     const address = 'https://hexlet.io/courses';
     const outDir = await mkdtemp();
     await download(address, outDir);
@@ -52,6 +61,7 @@ describe('Download', () => {
     const expected2 = [
       'test-ru-icon.png',
       'test-ru-script.js',
+      'test-ru-style.css',
     ];
     const files2 = await fs.readdir(path.join(outDir, expected1[1]));
     expect(files2).toEqual(expected2);

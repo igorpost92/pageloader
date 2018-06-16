@@ -40,7 +40,7 @@ const savePage = (urlLink, html, outDir) => {
     .then(({ errors }) => {
       if (errors.length) {
         console.error('There was a problem while downloading assets:');
-        errors.forEach(e => console.log(e.message));
+        errors.forEach(e => console.error(e.message));
       }
     });
 };
