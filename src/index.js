@@ -26,15 +26,15 @@ const savePage = (urlLink, html, outDir) => {
 
   const tasks = new Listr([
     {
-      title: 'Saving page',
-      task: () => saveContent(name, outDir, content),
-    },
-    {
       title: 'Saving assets',
       task: ctx => new Observable(observer =>
         downloadAssets(ctx, observer, assets, outDir, assetsDirPath)),
     },
-  ]);
+    {
+      title: 'Saving page',
+      task: () => saveContent(name, outDir, content),
+    },
+  ], { concurrent: true });
 
   return tasks.run()
     .then(({ errors }) => {
