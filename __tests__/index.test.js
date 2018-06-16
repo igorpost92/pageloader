@@ -56,8 +56,6 @@ describe('Download', () => {
     const files2 = await fs.readdir(path.join(outDir, expected1[1]));
     expect(files2).toEqual(expected2);
 
-    console.log(files2);
-
     const resultHtml = await fs.readFile(path.join(outDir, 'hexlet-io-courses.html'), 'utf-8');
     const expectedHtml = await fs.readFile(path.join(fixtures, 'after.html'), 'utf-8');
     expect(resultHtml).toBe(expectedHtml);
